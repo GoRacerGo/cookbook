@@ -7,12 +7,6 @@ Setup:
   1. Edit config.json and set your family password
   2. Run: python app.py
   3. Share the password with family members
-
-Security:
-  - All write operations require the family password
-  - Input is sanitized (HTML tags stripped)
-  - Security headers block common attack vectors
-  - Backups created before every write
 """
 
 import json
