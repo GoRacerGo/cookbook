@@ -1,0 +1,106 @@
+[
+  {
+    "timestamp": "2026-04-25T23:49:06.111280",
+    "user": "Eric",
+    "action": "added",
+    "recipe_name": "asdfasdf",
+    "redo_snapshot": {
+      "Category": "Meat",
+      "Subcategory": "Poultry",
+      "Recipe Name": "asdfasdf",
+      "Notes": "",
+      "Source": "",
+      "Ingredients": "",
+      "Instructions": "",
+      "Related Recipes": [],
+      "Extra Locations": []
+    },
+    "restored": true
+  },
+  {
+    "timestamp": "2026-04-25T23:26:46.407190",
+    "user": "Eric",
+    "action": "added",
+    "recipe_name": "teset",
+    "redo_snapshot": {
+      "Category": "Meat",
+      "Subcategory": "Dips, Salsas, and Pestos",
+      "Recipe Name": "teset",
+      "Notes": "",
+      "Source": "",
+      "Ingredients": "",
+      "Instructions": "",
+      "Related Recipes": [],
+      "Extra Locations": []
+    },
+    "restored": true
+  },
+  {
+    "timestamp": "2026-04-25T22:56:53.055120",
+    "user": "Eric",
+    "action": "deleted",
+    "recipe_name": "test",
+    "before": {
+      "Category": "Meat",
+      "Subcategory": "Poultry",
+      "Recipe Name": "test",
+      "Notes": "",
+      "Source": "",
+      "Ingredients": "",
+      "Instructions": "",
+      "Related Recipes": [],
+      "Extra Locations": [],
+      "_favorited_by": []
+    }
+  },
+  {
+    "timestamp": "2026-04-25T22:55:41.057452",
+    "user": "Eric",
+    "action": "deleted",
+    "recipe_name": "recipe",
+    "before": {
+      "Category": "Seafood",
+      "Subcategory": "Fish",
+      "Recipe Name": "recipe",
+      "Notes": "",
+      "Source": "",
+      "Ingredients": "",
+      "Instructions": "",
+      "Related Recipes": [],
+      "Extra Locations": [],
+      "_favorited_by": []
+    }
+  },
+  {
+    "timestamp": "2026-04-25T22:33:34.666590",
+    "user": "Eric",
+    "action": "edited",
+    "recipe_name": "Caesar Club Sandwich",
+    "before": {
+      "Category": "Appetizers",
+      "Subcategory": "Sandwiches and Crackers",
+      "Recipe Name": "Caesar Club Sandwich",
+      "Notes": "AKA Pentecost Sandwiches",
+      "Source": "Barefoot Contessa",
+      "Ingredients": "2 split (1 whole) chicken breasts, bone in, skin on\nGood olive oil\nKosher salt and freshly ground black pepper\n4 oz thinly sliced pancetta\n1 large garlic clove, chopped\n2 tbsp chopped fresh flat-leaf parsley\n1 ½ tsp anchovy paste\n1 tsp Dijon mustard\n1 ½ tbsp freshly squeezed lemon juice\n½ c good mayonnaise\n1 large ciabatta bread\n2 oz baby arugula, washed and spun dry\n12 sun-dried tomatoes in oil\n2 to 3 oz Parmesan, shaved",
+      "Instructions": "Preheat the oven to 350 degrees. Place the chicken breasts on a sheet pan skin side up. Rub the chicken with olive oil and sprinkle with salt and pepper. Roast for 35 to 40 minutes, until cooked through. Cool slightly, discard the skin and bones, and slice the meat thickly. Set aside. Meanwhile, place the pancetta on another sheet pan in a single layer. Roast for 10 to 15 minutes, until crisp. Set aside to drain on paper towels.\nPlace the garlic and parsley in the bowl of a food processor fitted with a steel blade and process until minced. Add the anchovy paste, mustard, lemon juice and mayonnaise and process again to make a smooth dressing. (Refrigerate the Caesar dressing if not using it immediately.)\nSlice the ciabatta in half horizontally and separate the top from the bottom. Toast the bread in the oven, cut side up, for 5 to 7 minutes; cool slightly. Spread the cut sides of each piece with the Caesar dressing. Place half the arugula on the bottom piece of bread and then layer in order: the sun-dried tomatoes, shaved Parmesan, crispy pancetta, and sliced chicken. Sprinkle with salt and pepper and finish with another layer of arugula. Place the top slice of ciabatta on top and cut in thirds crosswise. Serve at room temperature.",
+      "Related Recipes": [],
+      "Extra Locations": []
+    },
+    "changed_fields": [
+      "Notes"
+    ],
+    "redo_snapshot": {
+      "Category": "Appetizers",
+      "Subcategory": "Sandwiches and Crackers",
+      "Recipe Name": "Caesar Club Sandwich",
+      "Notes": "AKA Pentecost Sandwiches\n\ntest",
+      "Source": "Barefoot Contessa",
+      "Ingredients": "2 split (1 whole) chicken breasts, bone in, skin on\nGood olive oil\nKosher salt and freshly ground black pepper\n4 oz thinly sliced pancetta\n1 large garlic clove, chopped\n2 tbsp chopped fresh flat-leaf parsley\n1 ½ tsp anchovy paste\n1 tsp Dijon mustard\n1 ½ tbsp freshly squeezed lemon juice\n½ c good mayonnaise\n1 large ciabatta bread\n2 oz baby arugula, washed and spun dry\n12 sun-dried tomatoes in oil\n2 to 3 oz Parmesan, shaved",
+      "Instructions": "Preheat the oven to 350 degrees. Place the chicken breasts on a sheet pan skin side up. Rub the chicken with olive oil and sprinkle with salt and pepper. Roast for 35 to 40 minutes, until cooked through. Cool slightly, discard the skin and bones, and slice the meat thickly. Set aside. Meanwhile, place the pancetta on another sheet pan in a single layer. Roast for 10 to 15 minutes, until crisp. Set aside to drain on paper towels.\nPlace the garlic and parsley in the bowl of a food processor fitted with a steel blade and process until minced. Add the anchovy paste, mustard, lemon juice and mayonnaise and process again to make a smooth dressing. (Refrigerate the Caesar dressing if not using it immediately.)\nSlice the ciabatta in half horizontally and separate the top from the bottom. Toast the bread in the oven, cut side up, for 5 to 7 minutes; cool slightly. Spread the cut sides of each piece with the Caesar dressing. Place half the arugula on the bottom piece of bread and then layer in order: the sun-dried tomatoes, shaved Parmesan, crispy pancetta, and sliced chicken. Sprinkle with salt and pepper and finish with another layer of arugula. Place the top slice of ciabatta on top and cut in thirds crosswise. Serve at room temperature.",
+      "Related Recipes": [],
+      "Extra Locations": []
+    },
+    "restored": true
+  }
+]

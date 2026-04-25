@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luke Family Cookbook</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Crimson+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream:     '#FAF6F0',
+            bark:      '#42230A',
+            'bark-light': '#5C3A1E',
+            sienna:    '#A0522D',
+            'sienna-light': '#C4794E',
+            warmgray:  '#8B7D6B',
+            sand:      '#E2D5C3',
+            'sand-light': '#F3EBE0',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Crimson Pro', Georgia, serif; background-color: #FAF6F0; color: #42230A; overflow-x: hidden; }
+    html { overflow-x: hidden; }
+    h1, h2, h3, h4, .heading-font { font-family: 'Playfair Display', Georgia, serif; }
+    .card-hover { transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(66, 35, 10, 0.1); background-color: #F3EBE0; }
+    .row-hover { transition: background-color 0.1s ease, padding-left 0.15s ease; }
+    .row-hover:hover { background-color: #F3EBE0; padding-left: 1.25rem; }
+    .cat-divider { display: flex; align-items: center; gap: 1rem; margin: 2.5rem 0 1rem; }
+    .cat-divider::before, .cat-divider::after { content: ''; flex: 1; height: 1px; background: #E2D5C3; }
+    .form-input { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #E2D5C3; border-radius: 0.5rem; background: white; font-family: 'Crimson Pro', Georgia, serif; font-size: 1.05rem; color: #42230A; transition: border-color 0.15s; }
+    .form-input:focus { outline: none; border-color: #A0522D; box-shadow: 0 0 0 2px rgba(160, 82, 45, 0.15); }
+    textarea.form-input { resize: vertical; min-height: 100px; }
+    .picker-dropdown { position: absolute; top: 100%; left: 0; right: 0; max-height: 400px; overflow-y: auto; background: white; color: #42230A; border: 1px solid #E2D5C3; border-top: none; border-radius: 0 0 0.5rem 0.5rem; box-shadow: 0 4px 12px rgba(66, 35, 10, 0.1); z-index: 50; }
+    .picker-item { padding: 0.5rem 0.75rem; cursor: pointer; font-size: 0.95rem; }
+    .picker-item:hover { background: #F3EBE0; }
+    .picker-item .picker-source { color: #8B7D6B; font-size: 0.8rem; }
+    @media print { header, #hero, nav, .no-print { display: none !important; } body { background: white; } main { padding: 0; } #content { box-shadow: none; border: none; padding: 1rem; } }
+    #content { transition: opacity 0.15s ease; }
+    #hero { transition: opacity 0.15s ease; }
+    #content.fading, #hero.fading { opacity: 0; }
+    mark { background-color: #E2D5C3; color: #42230A; border-radius: 2px; padding: 0 2px; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <header class="bg-bark text-cream shadow-lg sticky top-0 z-40">
+    <div class="max-w-5xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between mb-2">
+        <h1 class="text-xl md:text-3xl font-bold cursor-pointer tracking-wide" data-action="goHome">
+          <span class="mr-1">🍳</span>Luke Family Cookbook
+        </h1>
+        <div class="flex items-center gap-1 md:gap-2 flex-wrap justify-end">
+          <button data-action="showFavorites" class="px-2 md:px-3 py-1 rounded-lg bg-bark-light text-sand hover:text-white hover:bg-sienna transition-colors text-xs md:text-sm">♥ Favorites</button>
+          <button data-action="showChangelog" class="px-2 md:px-3 py-1 rounded-lg bg-bark-light text-sand hover:text-white hover:bg-sienna transition-colors text-xs md:text-sm">Changes</button>
+          <button data-action="exportCSV" class="px-2 md:px-3 py-1 rounded-lg bg-bark-light text-sand hover:text-white hover:bg-sienna transition-colors text-xs md:text-sm" title="Download as CSV">↓ CSV</button>
+        </div>
+      </div>
+      <div class="flex gap-2 items-center">
+        <div class="relative flex-1 min-w-0">
+          <input id="searchInput" type="search" enterkeyhint="search" placeholder="Search recipes..."
+                 class="w-full px-3 py-1.5 rounded-lg bg-bark-light text-cream placeholder-warmgray border border-bark-light focus:outline-none focus:border-sienna text-sm md:text-base"
+                 style="font-family: 'Crimson Pro', Georgia, serif;">
+          <div id="searchDropdown" class="picker-dropdown hidden"></div>
+        </div>
+        <select id="searchScope"
+                class="flex-shrink-0 px-2 py-1.5 rounded-lg bg-bark-light text-cream border border-bark-light focus:outline-none focus:border-sienna text-xs md:text-sm"
+                style="font-family: 'Crimson Pro', Georgia, serif;">
+          <option value="all">All</option>
+          <option value="name">Name</option>
+          <option value="ingredients">Ingredients</option>
+          <option value="instructions">Instructions</option>
+          <option value="category">Category</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <div id="hero" class="max-w-5xl mx-auto px-4"></div>
+  <nav class="max-w-5xl mx-auto px-4 py-3"><div id="breadcrumbs" class="text-sm text-warmgray flex flex-wrap items-center gap-1"></div></nav>
+  <main class="max-w-5xl mx-auto px-4 pb-16"><div id="content" class="bg-white rounded-2xl shadow-sm border border-sand p-4 md:p-8 overflow-hidden"><p class="text-warmgray text-center py-12 text-lg">Loading recipes...</p></div></main>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let data = [];
+let currentView = 'home', currentCategory = '', currentSubcategory = '', currentRecipeIndex = -1;
+let formMode = 'add', formEditIndex = -1, formReturnView = null, formRelated = [], formExtraLocs = [];
+let userName = localStorage.getItem('cookbookUserName') || '';
+let writePassword = localStorage.getItem('cookbookPassword') || '';
+let allFavorites = {};
+let formDirty = false;  // Track unsaved form changes
+let suppressPush = false; // Prevent pushState during popstate handling
+const CATEGORY_ORDER = ['Appetizers','Seafood','Meat','Eggs, Pastas, and Grains','Vegetables','Breads','Rubs, Sauces, and Dressings','Desserts and Sweets','Beverages'];
+
+// ═══════════════════════════════════════════════════════════
+// DATA LOADING
+// ═══════════════════════════════════════════════════════════
+async function loadData() {
+  try {
+    const res = await fetch('/api/recipes');
+    data = await res.json();
+    data = data.filter(r => (r.Category||'').trim().length>1 && (r['Recipe Name']||'').trim().length>1);
+    await loadFavorites();
+    renderHome();
+  } catch (err) {
+    document.getElementById('content').innerHTML = `<p class="text-red-700">Failed to load recipes.</p><p class="text-warmgray mt-2 text-sm">${esc(err.message)}</p>`;
+  }
+}
+async function loadFavorites() {
+  try { allFavorites = await (await fetch('/api/favorites')).json(); } catch(e) { allFavorites = {}; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// USER IDENTITY
+// ═══════════════════════════════════════════════════════════
+function getUserName() {
+  if (userName) return userName;
+  const name = prompt("What's your name? This is used for favorites and to track edits.");
+  if (!name || !name.trim()) return null;
+  userName = name.trim();
+  localStorage.setItem('cookbookUserName', userName);
+  return userName;
+}
+
+/** Get the write password, prompting if not set. Returns null if user cancels. */
+async function getPassword() {
+  if (writePassword) {
+    // Verify it's still valid
+    const res = await fetch('/api/auth-check', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({_password: writePassword})
+    });
+    if (res.ok) return writePassword;
+    // Password is wrong (maybe changed on server) — clear and re-prompt
+    writePassword = '';
+    localStorage.removeItem('cookbookPassword');
+  }
+  const pw = prompt("Enter the family password to make changes:");
+  if (!pw) return null;
+  // Verify
+  const res = await fetch('/api/auth-check', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({_password: pw})
+  });
+  if (!res.ok) {
+    alert('Incorrect password.');
+    return null;
+  }
+  writePassword = pw;
+  localStorage.setItem('cookbookPassword', writePassword);
+  return writePassword;
+}
+function isMyFavorite(recipeName) {
+  return userName && (allFavorites[userName]||[]).includes(recipeName);
+}
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function slug(t) { return (t||'').toString().toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-'); }
+function getHeroImageUrl(type,name='') { const b='/images/'; if(type==='home') return b+'home-family.jpg'; if(type==='category') return b+`category-${slug(name)}.jpg`; if(type==='subcategory') return b+`subcategory-${slug(name)}.jpg`; return b+'home-family.jpg'; }
+function renderHeroImage(type,name='',alt='Luke Family Cookbook') { return `<div class="max-w-3xl mx-auto mt-4 mb-2 rounded-3xl overflow-hidden shadow-md border border-sand"><img src="${getHeroImageUrl(type,name)}" alt="${esc(alt)}" class="w-full h-32 md:h-40 object-cover"></div>`; }
+function renderHero(type,name='',alt='Luke Family Cookbook') { document.getElementById('hero').innerHTML = renderHeroImage(type,name,alt); }
+function esc(s) { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+function getCategories() {
+  const s=new Set(); data.forEach(r=>{ if(r.Category) s.add(r.Category); (r['Extra Locations']||[]).forEach(l=>{if(l.Category) s.add(l.Category);}); });
+  const c=[...s]; return CATEGORY_ORDER.filter(x=>c.includes(x)).concat(c.filter(x=>!CATEGORY_ORDER.includes(x)).sort());
+}
+function findRecipeIndex(name) {
+  if(!name) return -1;
+  const l=name.toLowerCase().trim();
+  // Try exact name match
+  const exact = data.findIndex(r=>(r['Recipe Name']||'').toLowerCase().trim()===l);
+  if (exact >= 0) {
+    // Check if this name is unique — if so, return it
+    const dupes = data.filter(r=>(r['Recipe Name']||'').toLowerCase().trim()===l);
+    if (dupes.length <= 1) return exact;
+  }
+  // Try "Name — Source" disambiguated format
+  for (let i=0; i<data.length; i++) {
+    const r = data[i];
+    const combo = `${(r['Recipe Name']||'')} — ${(r.Source||'')}`.toLowerCase().trim();
+    if (combo === l) return i;
+  }
+  // Fall back to first match
+  return exact;
+}
+function getRecipesIn(cat,sub) {
+  const r=[]; data.forEach((d,i)=>{ if(d.Category===cat&&d.Subcategory===sub){r.push({index:i,recipe:d});return;} for(const l of(d['Extra Locations']||[])){if(l.Category===cat&&l.Subcategory===sub){r.push({index:i,recipe:d});return;}} });
+  r.sort((a,b)=>(a.recipe['Recipe Name']||'').localeCompare(b.recipe['Recipe Name']||''));
+  return r;
+}
+function countInCategory(cat) { const s=new Set(); data.forEach((r,i)=>{ if(r.Category===cat) s.add(i); (r['Extra Locations']||[]).forEach(l=>{if(l.Category===cat) s.add(i);}); }); return s.size; }
+function getSubcategories(cat) { const s=new Set(); data.forEach(r=>{ if(r.Category===cat) s.add(r.Subcategory); (r['Extra Locations']||[]).forEach(l=>{if(l.Category===cat) s.add(l.Subcategory);}); }); return [...s].filter(Boolean).sort(); }
+function ingredientsToHTML(t) { if(!t) return '<p class="text-warmgray italic">No ingredients listed.</p>'; return t.split('\n').filter(l=>l.trim()).map(l=>`<li class="mb-1 leading-relaxed">${esc(l.trim())}</li>`).join(''); }
+function instructionsToHTML(t) { if(!t) return '<p class="text-warmgray italic">No instructions listed.</p>'; return t.split('\n').filter(l=>l.trim()).map(l=>`<p class="mb-3 leading-relaxed">${esc(l.trim())}</p>`).join(''); }
+function recipeRow(index,recipe) { const src=recipe.Source?`<span class="text-warmgray ml-2">— ${esc(recipe.Source)}</span>`:''; return `<div class="row-hover py-2 px-3 rounded-lg cursor-pointer" data-action="showRecipe" data-idx="${index}"><span class="font-medium">${esc(recipe['Recipe Name'])}</span>${src}</div>`; }
+function timeAgo(iso) { const d=new Date(iso),now=new Date(),m=Math.floor((now-d)/60000); if(m<1) return 'just now'; if(m<60) return m+'m ago'; const h=Math.floor(m/60); if(h<24) return h+'h ago'; const dy=Math.floor(h/24); if(dy<7) return dy+'d ago'; return d.toLocaleDateString(); }
+
+/** Update browser tab title */
+function updateTitle(subtitle) {
+  document.title = subtitle ? `${subtitle} — Luke Family Cookbook` : 'Luke Family Cookbook';
+}
+
+/** Clear search input when navigating away from search */
+function clearSearch() {
+  const input = document.getElementById('searchInput');
+  if (input) input.value = '';
+  const dd = document.getElementById('searchDropdown');
+  if (dd) dd.classList.add('hidden');
+}
+
+/** Check if form has unsaved changes; returns true if safe to navigate */
+function checkDirtyForm() {
+  if (currentView === 'form' && formDirty) {
+    return confirm('You have unsaved changes. Leave anyway?');
+  }
+  return true;
+}
+
+/** Mark form as dirty when inputs change */
+function watchFormInputs() {
+  formDirty = false;
+  document.querySelectorAll('#content .form-input').forEach(el => {
+    el.addEventListener('input', () => { formDirty = true; });
+    el.addEventListener('change', () => { formDirty = true; });
+  });
+}
+
+/** Push browser history state */
+function pushHistory() {
+  if (suppressPush) return;
+  const state = { view: currentView, cat: currentCategory, sub: currentSubcategory, idx: currentRecipeIndex };
+  history.pushState(state, '');
+}
+
+/** Fade-transition the content area (and hero if provided) */
+function setContent(html, heroHtml) {
+  const el = document.getElementById('content');
+  const hero = document.getElementById('hero');
+  el.classList.add('fading');
+  hero.classList.add('fading');
+  setTimeout(() => {
+    el.innerHTML = html;
+    if (heroHtml !== undefined) hero.innerHTML = heroHtml;
+    window.scrollTo(0, 0);
+    el.classList.remove('fading');
+    hero.classList.remove('fading');
+  }, 150);
+}
+
+/** Highlight search term in text (returns HTML with <mark> tags) */
+function highlightTerm(text, term) {
+  if (!term || !text) return esc(text);
+  const escaped = esc(text);
+  const termEsc = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${termEsc})`, 'gi');
+  return escaped.replace(regex, '<mark>$1</mark>');
+}
+
+/** Called on every navigation — scrolls to top, clears search, pushes history */
+function onNavigate(subtitle) {
+  if (currentView !== 'search') clearSearch();
+  updateTitle(subtitle || '');
+  pushHistory();
+}
+
+/** Handle browser back/forward buttons */
+window.addEventListener('popstate', function(e) {
+  const s = e.state;
+  if (!s) { suppressPush = true; renderHome(); suppressPush = false; return; }
+  suppressPush = true;
+  if (s.view === 'category' && s.cat) showCategory(s.cat);
+  else if (s.view === 'subcategory' && s.cat && s.sub) showSubcategory(s.cat, s.sub);
+  else if (s.view === 'recipe' && s.idx >= 0 && s.idx < data.length) showRecipe(s.idx);
+  else renderHome();
+  suppressPush = false;
+});
+
+/** Warn before closing tab with unsaved form changes */
+window.addEventListener('beforeunload', function(e) {
+  if (currentView === 'form' && formDirty) { e.preventDefault(); e.returnValue = ''; }
+});
+
+function buildListing(filterCat) {
+  const cats = filterCat ? [filterCat] : getCategories(); let html = '';
+  cats.forEach(cat => {
+    if (!filterCat) html += `<div class="cat-divider mt-8 first:mt-4"><span class="heading-font text-lg font-semibold text-sienna cursor-pointer hover:text-bark transition-colors" data-action="showCategory" data-cat="${esc(cat)}">${esc(cat)}</span></div>`;
+    getSubcategories(cat).forEach(sub => {
+      html += `<div class="mt-4 mb-2"><h4 class="heading-font text-base font-semibold text-bark-light cursor-pointer hover:text-sienna transition-colors pl-2 mb-1" data-action="showSubcategory" data-cat="${esc(cat)}" data-sub="${esc(sub)}">${esc(sub)}</h4><div class="pl-4 border-l-2 border-sand grid grid-cols-1 md:grid-cols-2 gap-x-4">`;
+      getRecipesIn(cat,sub).forEach(({index,recipe})=>{ html+=recipeRow(index,recipe); });
+      html += `</div></div>`;
+    });
+  });
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════════
+// LIVE SEARCH DROPDOWN
+// ═══════════════════════════════════════════════════════════
+function setupMainSearchPicker() {
+  const input = document.getElementById('searchInput');
+  const dropdown = document.getElementById('searchDropdown');
+  if (!input || !dropdown) return;
+
+  function showLiveResults() {
+    const term = input.value.trim().toLowerCase();
+    const scope = document.getElementById('searchScope').value;
+    if (term.length < 2) { dropdown.classList.add('hidden'); return; }
+
+    const results = [];
+    data.forEach((r, i) => {
+      let h = '';
+      switch (scope) {
+        case 'name': h = r['Recipe Name']||''; break;
+        case 'ingredients': h = r.Ingredients||''; break;
+        case 'instructions': h = r.Instructions||''; break;
+        case 'category': h = (r.Category||'')+' '+(r.Subcategory||''); break;
+        default: h = [r['Recipe Name'],r.Ingredients,r.Instructions,r.Notes,r.Category,r.Subcategory].filter(Boolean).join(' ');
+      }
+      if (h.toLowerCase().includes(term)) results.push({index:i, recipe:r});
+    });
+
+    if (!results.length) { dropdown.classList.add('hidden'); return; }
+    const rawTerm = input.value.trim();
+    dropdown.innerHTML = results.map(({index,recipe}) => {
+      const src = recipe.Source ? `<span class="picker-source"> — ${highlightTerm(recipe.Source,rawTerm)}</span>` : '';
+      return `<div class="picker-item" data-action="showRecipe" data-idx="${index}">${highlightTerm(recipe['Recipe Name'],rawTerm)}${src}</div>`;
+    }).join('');
+    dropdown.classList.remove('hidden');
+  }
+
+  input.addEventListener('input', showLiveResults);
+  input.addEventListener('focus', showLiveResults);
+  input.addEventListener('blur', () => setTimeout(() => dropdown.classList.add('hidden'), 200));
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { dropdown.classList.add('hidden'); searchRecipes(); }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// BREADCRUMBS
+// ═══════════════════════════════════════════════════════════
+function updateBreadcrumbs() {
+  let html = `<span class="cursor-pointer hover:text-sienna transition-colors text-2xl md:text-4xl font-semibold py-2 px-1 md:px-2" data-action="goHome">⌂ Home</span>`;
+
+  if (['category','subcategory','recipe'].includes(currentView)) {
+    if (currentCategory && currentView !== 'category') {
+      html += ` <span class="mx-1">›</span> <span class="cursor-pointer hover:text-sienna transition-colors font-semibold text-xl md:text-3xl py-1 px-1 md:py-2 md:px-2" data-action="showCategory" data-cat="${esc(currentCategory)}">${esc(currentCategory)}</span>`;
+    }
+    if (currentSubcategory && currentView === 'recipe') {
+      html += ` <span class="mx-1">›</span> <span class="cursor-pointer hover:text-sienna transition-colors font-semibold text-xl md:text-3xl py-1 px-1 md:py-2 md:px-2" data-action="showSubcategory" data-cat="${esc(currentCategory)}" data-sub="${esc(currentSubcategory)}">${esc(currentSubcategory)}</span>`;
+    }
+  }
+
+  document.getElementById('breadcrumbs').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════
+// HOME / CATEGORY / SUBCATEGORY
+// ═══════════════════════════════════════════════════════════
+function renderHome() {
+  currentView='home'; currentCategory=''; currentSubcategory=''; currentRecipeIndex=-1; updateBreadcrumbs();
+  onNavigate();
+  const heroHtml=renderHeroImage('home');
+  const cats=getCategories();
+  let html=`<div class="flex items-center justify-between mb-6"><h2 class="heading-font text-2xl font-semibold text-bark">Categories</h2><button class="text-sm text-sienna hover:text-bark border border-sienna hover:border-bark rounded-full px-4 py-1.5 transition-colors" data-action="addRecipe" data-cat="" data-sub="">+ Add Recipe</button></div><div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">`;
+  cats.forEach(cat=>{ const c=countInCategory(cat); html+=`<div class="card-hover p-5 border-2 border-sand rounded-2xl cursor-pointer" data-action="showCategory" data-cat="${esc(cat)}"><div class="heading-font text-lg font-semibold text-bark">${esc(cat)}</div><div class="text-sm text-warmgray mt-1">${c} recipe${c!==1?'s':''}</div></div>`; });
+  html+=`</div><div class="mt-2">${buildListing(null)}</div>`;
+  setContent(html, heroHtml);
+}
+function showCategory(cat) {
+  currentView='category'; currentCategory=cat; currentSubcategory=''; currentRecipeIndex=-1; updateBreadcrumbs();
+  onNavigate(cat);
+  const heroHtml=renderHeroImage('category',cat,cat);
+  let html=`<div class="flex items-center justify-between mb-6"><h2 class="heading-font text-2xl font-semibold text-bark">${esc(cat)}</h2><button class="text-sm text-sienna hover:text-bark border border-sienna hover:border-bark rounded-full px-4 py-1.5 transition-colors" data-action="addRecipe" data-cat="${esc(cat)}" data-sub="">+ Add Recipe</button></div><div class="space-y-3 mb-6">`;
+  getSubcategories(cat).forEach(sub=>{ html+=`<div class="card-hover flex justify-between items-center p-4 border border-sand rounded-xl cursor-pointer" data-action="showSubcategory" data-cat="${esc(cat)}" data-sub="${esc(sub)}"><span class="font-medium text-bark">${esc(sub)}</span><span class="text-sienna text-lg">›</span></div>`; });
+  html+=`</div>${buildListing(cat)}`;
+  setContent(html, heroHtml);
+}
+function showSubcategory(cat,sub) {
+  currentView='subcategory'; currentCategory=cat; currentSubcategory=sub; currentRecipeIndex=-1; updateBreadcrumbs();
+  onNavigate(sub);
+  const heroHtml=renderHeroImage('subcategory',sub,sub);
+  let html=`<div class="flex items-center justify-between mb-6"><h2 class="heading-font text-2xl font-semibold text-bark">${esc(sub)}</h2><button class="text-sm text-sienna hover:text-bark border border-sienna hover:border-bark rounded-full px-4 py-1.5 transition-colors" data-action="addRecipe" data-cat="${esc(cat)}" data-sub="${esc(sub)}">+ Add Recipe</button></div><div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">`;
+  getRecipesIn(cat,sub).forEach(({index,recipe})=>{ html+=recipeRow(index,recipe); });
+  html+=`</div>`; setContent(html, heroHtml);
+}
+
+// ═══════════════════════════════════════════════════════════
+// RECIPE DETAIL
+// ═══════════════════════════════════════════════════════════
+function showRecipe(index) {
+  const recipe=data[index]; if(!recipe) return;
+  currentView='recipe'; currentCategory=recipe.Category; currentSubcategory=recipe.Subcategory; currentRecipeIndex=index;
+  updateBreadcrumbs();
+  onNavigate(recipe['Recipe Name']);
+
+  const source=recipe.Source?`<p class="text-warmgray text-lg mb-1">${esc(recipe.Source)}</p>`:'';
+  const notes=recipe.Notes?`<div class="bg-sand-light border border-sand rounded-xl p-4 mb-6 text-bark">${esc(recipe.Notes).replace(/\n/g,'<br>')}</div>`:'';
+
+  const extras=recipe['Extra Locations']||[];
+  let extrasHTML='';
+  if(extras.length>0){ extrasHTML=`<div class="text-sm text-warmgray mb-4">Also filed under: `+extras.map(l=>`<span class="cursor-pointer hover:text-sienna transition-colors" data-action="showSubcategory" data-cat="${esc(l.Category)}" data-sub="${esc(l.Subcategory)}">${esc(l.Category)} › ${esc(l.Subcategory)}</span>`).join(', ')+`</div>`; }
+
+  const related=(recipe['Related Recipes']||[]).filter(Boolean);
+  let relatedHTML='';
+  if(related.length>0){
+    relatedHTML=`<div class="mb-6"><div class="flex flex-wrap gap-2">`;
+    related.forEach(key=>{ const idx=findRecipeIndex(key); const displayName=getRelatedDisplayName(key); if(idx>=0) relatedHTML+=`<span class="inline-block px-4 py-2 bg-sand border border-sand rounded-full text-xl cursor-pointer hover:bg-sand hover:text-warmgray hover:border-warmgray transition-colors" data-action="showRecipe" data-idx="${idx}">${esc(displayName)}</span>`; else relatedHTML+=`<span class="inline-block px-4 py-2 bg-sand-light border border-sand rounded-full text-xl text-warmgray">${esc(displayName)}</span>`; });
+    relatedHTML+=`</div></div>`;
+  }
+
+  const isFav=isMyFavorite(recipe['Recipe Name']);
+  const favHeart=isFav?'♥':'♡';
+  const favClass=isFav?'text-red-500':'text-warmgray';
+
+  let html=`${extrasHTML}
+    <div class="flex flex-wrap items-start justify-between gap-2 mb-1">
+      <h2 class="heading-font text-2xl md:text-3xl font-bold text-bark">${esc(recipe['Recipe Name'])}</h2>
+      <div class="flex gap-2 flex-shrink-0 no-print">
+        <button class="${favClass} text-2xl hover:text-red-500 transition-colors" data-action="toggleFavorite" data-idx="${index}" title="Favorite">${favHeart}</button>
+        <button class="text-warmgray hover:text-sienna text-sm border border-sand hover:border-sienna rounded-full px-3 py-1 transition-colors" onclick="window.print()">⎙ Print</button>
+        <button class="text-warmgray hover:text-sienna text-sm border border-sand hover:border-sienna rounded-full px-3 py-1 transition-colors" data-action="editRecipe" data-idx="${index}">✎ Edit</button>
+      </div>
+    </div>${source}${notes}${relatedHTML}`;
+
+  const hasI=recipe.Ingredients&&recipe.Ingredients.trim(), hasN=recipe.Instructions&&recipe.Instructions.trim();
+  if(hasI&&hasN) html+=`<div class="grid md:grid-cols-5 gap-8"><div class="md:col-span-2"><h3 class="heading-font text-xl font-semibold mb-3 pb-2 border-b border-sand text-bark">Ingredients</h3><ul class="text-bark">${ingredientsToHTML(recipe.Ingredients)}</ul></div><div class="md:col-span-3"><h3 class="heading-font text-xl font-semibold mb-3 pb-2 border-b border-sand text-bark">Instructions</h3><div class="text-bark">${instructionsToHTML(recipe.Instructions)}</div></div></div>`;
+  else if(hasI) html+=`<h3 class="heading-font text-xl font-semibold mb-3 pb-2 border-b border-sand text-bark">Ingredients</h3><ul class="text-bark">${ingredientsToHTML(recipe.Ingredients)}</ul>`;
+  else if(hasN) html+=`<h3 class="heading-font text-xl font-semibold mb-3 pb-2 border-b border-sand text-bark">Instructions</h3><div class="text-bark">${instructionsToHTML(recipe.Instructions)}</div>`;
+  setContent(html, "");
+}
+
+// ═══════════════════════════════════════════════════════════
+// SEARCH (full page)
+// ═══════════════════════════════════════════════════════════
+function searchRecipes() {
+  const term=document.getElementById('searchInput').value.trim().toLowerCase();
+  if(!term){if(currentView==='search') renderHome(); return;}
+  const scope=document.getElementById('searchScope').value;
+  const results=[];
+  data.forEach((r,i)=>{
+    let h='';
+    if(scope==='name') h=r['Recipe Name']||''; else if(scope==='ingredients') h=r.Ingredients||''; else if(scope==='instructions') h=r.Instructions||''; else if(scope==='category') h=(r.Category||'')+' '+(r.Subcategory||''); else h=[r['Recipe Name'],r.Ingredients,r.Instructions,r.Notes,r.Category,r.Subcategory].filter(Boolean).join(' ');
+    if(h.toLowerCase().includes(term)) results.push({index:i,recipe:r});
+  });
+  currentView='search'; updateBreadcrumbs();
+  updateTitle('Search Results'); pushHistory();
+  let html=`<h2 class="heading-font text-2xl font-semibold mb-4 text-bark">${results.length} result${results.length!==1?'s':''} for "${esc(document.getElementById('searchInput').value.trim())}"</h2>`;
+  if(!results.length) html+=`<p class="text-warmgray text-lg py-8 text-center">No recipes matched.</p>`;
+  else { const rawTerm=document.getElementById('searchInput').value.trim(); html+=`<div class="space-y-1">`; results.forEach(({index,recipe})=>{ const src=recipe.Source?`<span class="text-warmgray">— ${highlightTerm(recipe.Source,rawTerm)}</span>`:''; html+=`<div class="row-hover py-3 px-3 rounded-lg cursor-pointer" data-action="showRecipe" data-idx="${index}"><div class="font-medium">${highlightTerm(recipe['Recipe Name'],rawTerm)} ${src}</div><div class="text-xs text-warmgray mt-0.5">${esc(recipe.Category)} › ${esc(recipe.Subcategory)}</div></div>`; }); html+=`</div>`; }
+  setContent(html, "");
+}
+
+// ═══════════════════════════════════════════════════════════
+// FAVORITES
+// ═══════════════════════════════════════════════════════════
+async function toggleFavorite(index) {
+  const name=getUserName(); if(!name) return;
+  try { await fetch('/api/favorites',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:name,recipe_name:data[index]['Recipe Name']})}); await loadFavorites(); showRecipe(index); } catch(e){ alert('Failed: '+e.message); }
+}
+async function renderFavorites() {
+  currentView='favorites'; currentCategory=''; currentSubcategory=''; currentRecipeIndex=-1; updateBreadcrumbs(); await loadFavorites();
+  onNavigate('Favorites');
+  const users=Object.keys(allFavorites).sort();
+  let html=`<h2 class="heading-font text-2xl font-semibold mb-6 text-bark">♥ Family Favorites</h2>`;
+  if(!users.length) html+=`<p class="text-warmgray text-lg py-8 text-center">No favorites yet! Open any recipe and tap the heart to save it.</p>`;
+  else {
+    const sorted=userName?[userName,...users.filter(u=>u!==userName)].filter(u=>allFavorites[u]):users;
+    sorted.forEach(user=>{
+      const favs=allFavorites[user]||[]; if(!favs.length) return;
+      const isMe=user===userName;
+      html+=`<div class="mb-8"><h3 class="heading-font text-xl font-semibold mb-3 ${isMe?'text-sienna':'text-bark'}">${esc(user)}${isMe?' (you)':''}</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 pl-4 border-l-2 border-sand">`;
+      favs.forEach(rn=>{ const idx=findRecipeIndex(rn); if(idx>=0) html+=recipeRow(idx,data[idx]); else html+=`<div class="py-2 px-3 text-warmgray">${esc(rn)} <span class="text-sm">(not found)</span></div>`; });
+      html+=`</div></div>`;
+    });
+  }
+  setContent(html, "");
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHANGELOG
+// ═══════════════════════════════════════════════════════════
+async function renderChangelog() {
+  currentView='changelog'; currentCategory=''; currentSubcategory=''; currentRecipeIndex=-1; updateBreadcrumbs();
+  onNavigate('Recent Changes');
+  let log=[]; try { log=await(await fetch('/api/changelog')).json(); } catch(e){}
+  let html=`<h2 class="heading-font text-2xl font-semibold mb-6 text-bark">Recent Changes</h2>`;
+  if(!log.length) html+=`<p class="text-warmgray text-lg py-8 text-center">No changes recorded yet.</p>`;
+  else { html+=`<div class="space-y-3">`; log.forEach((entry,i)=>{
+    const verb=entry.action||'changed';
+    const icon=verb==='added'?'➕':verb==='deleted'?'🗑️':verb==='restored'?'↩️':verb.startsWith('undid')?'↩️':'✏️';
+    const isUndone = !!entry.restored;
+    const hasAction = entry.before || verb === 'added';
+
+    let btn = '';
+    if (hasAction) {
+      if (isUndone) {
+        btn = `<button class="text-sm text-sienna hover:text-bark border border-sand hover:border-sienna rounded-full px-3 py-1 ml-2 transition-colors" data-action="restoreRecipe" data-cidx="${i}">Redo</button>`;
+      } else if (verb === 'added') {
+        btn = `<button class="text-sm text-sienna hover:text-bark border border-sand hover:border-sienna rounded-full px-3 py-1 ml-2 transition-colors" data-action="restoreRecipe" data-cidx="${i}">Undo</button>`;
+      } else {
+        btn = `<button class="text-sm text-sienna hover:text-bark border border-sand hover:border-sienna rounded-full px-3 py-1 ml-2 transition-colors" data-action="restoreRecipe" data-cidx="${i}">Restore</button>`;
+      }
+    }
+
+    // Clickable recipe name if it exists in data
+    const rIdx = findRecipeIndex(entry.recipe_name);
+    const nameHTML = rIdx >= 0
+      ? `<span class="font-medium cursor-pointer hover:text-sienna transition-colors" data-action="showRecipe" data-idx="${rIdx}">${esc(entry.recipe_name)}</span>`
+      : `<span class="font-medium">${esc(entry.recipe_name)}</span>`;
+
+    // Changed fields for edits
+    const fields = entry.changed_fields || [];
+    const fieldsHTML = fields.length > 0
+      ? `<div class="text-xs text-warmgray mt-0.5">Changed: ${fields.map(f => esc(f)).join(', ')}</div>`
+      : '';
+
+    const dimClass = isUndone ? 'opacity-50' : '';
+
+    html+=`<div class="flex flex-wrap items-center justify-between gap-2 p-3 border border-sand rounded-xl ${dimClass}"><div class="min-w-0"><span class="mr-2">${icon}</span><span class="font-semibold">${esc(entry.user)}</span><span class="text-warmgray"> ${verb} </span>${nameHTML}<span class="text-warmgray text-sm ml-2">${timeAgo(entry.timestamp)}</span>${isUndone?'<span class="text-xs text-warmgray ml-2 italic">— undone</span>':''}${fieldsHTML}</div>${btn}</div>`;
+  }); html+=`</div>`; }
+  setContent(html, "");
+}
+async function restoreRecipe(ci) {
+  const pw = await getPassword(); if(!pw) return;
+  const user=getUserName();
+  try {
+    const res=await fetch('/api/restore',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({changelog_index:ci,_user:user,_password:pw})});
+    if(!res.ok){const e=await res.json(); alert('Failed: '+(e.error||'Unknown')); return;}
+    data=await(await fetch('/api/recipes')).json();
+    renderChangelog();
+  } catch(e){ alert('Failed: '+e.message); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// FORM
+// ═══════════════════════════════════════════════════════════
+function showForm(mode,index,prefillCat,prefillSub) {
+  formMode=mode; formEditIndex=index;
+  formReturnView={view:currentView,category:currentCategory,subcategory:currentSubcategory,recipeIndex:currentRecipeIndex};
+  currentView='form'; updateBreadcrumbs();
+  onNavigate(mode==='add'?'Add Recipe':'Edit Recipe');
+  let cat=prefillCat||'',sub=prefillSub||'',name='',notes='',source='',ingredients='',instructions='';
+  formRelated=[]; formExtraLocs=[];
+  if(mode==='edit'&&index>=0){ const r=data[index]; cat=r.Category||''; sub=r.Subcategory||''; name=r['Recipe Name']||''; notes=r.Notes||''; source=r.Source||''; ingredients=r.Ingredients||''; instructions=r.Instructions||''; formRelated=[...(r['Related Recipes']||[])]; formExtraLocs=(r['Extra Locations']||[]).map(l=>({...l})); }
+  const allCats=getCategories();
+  const catOpts=allCats.map(c=>`<option value="${esc(c)}" ${c===cat?'selected':''}>${esc(c)}</option>`).join('');
+  const subOpts=(cat?getSubcategories(cat):[]).map(s=>`<option value="${esc(s)}" ${s===sub?'selected':''}>${esc(s)}</option>`).join('');
+  const delBtn=mode==='edit'?`<button class="px-5 py-2 border border-red-300 text-red-700 rounded-xl hover:bg-red-50 transition-colors" data-action="deleteRecipe" data-idx="${index}">Delete Recipe</button>`:'';
+
+  setContent(`
+    <h2 class="heading-font text-2xl font-semibold mb-6 text-bark">${mode==='add'?'Add New Recipe':'Edit Recipe'}</h2>
+    <div class="space-y-5 max-w-2xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold text-warmgray mb-1">Recipe Name *</label><input id="formName" class="form-input" value="${esc(name)}" placeholder="What's it called?"></div><div><label class="block text-sm font-semibold text-warmgray mb-1">Source</label><input id="formSource" class="form-input" value="${esc(source)}" placeholder="Who's it from?"></div></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold text-warmgray mb-1">Category *</label><select id="formCat" class="form-input"><option value="">Select category...</option>${catOpts}</select></div><div><label class="block text-sm font-semibold text-warmgray mb-1">Subcategory *</label><select id="formSub" class="form-input"><option value="">Select subcategory...</option>${subOpts}</select></div></div>
+      <div><div id="extraLocList" class="space-y-2 mb-2"></div><button class="text-sm text-sienna hover:text-bark transition-colors" data-action="addExtraLoc">+ Add another location</button></div>
+      <div><label class="block text-sm font-semibold text-warmgray mb-1">Related Recipes</label><div id="relatedList" class="flex flex-wrap gap-2 mb-2"></div><div class="relative"><input id="relatedInput" class="form-input" placeholder="Type to search recipes..." autocomplete="off"><div id="relatedDropdown" class="picker-dropdown hidden"></div></div></div>
+      <div><label class="block text-sm font-semibold text-warmgray mb-1">Notes</label><textarea id="formNotes" class="form-input" rows="3" placeholder="Yield, tips, variations...">${esc(notes)}</textarea></div>
+      <div><label class="block text-sm font-semibold text-warmgray mb-1">Ingredients</label><textarea id="formIngredients" class="form-input" rows="8" placeholder="One ingredient per line">${esc(ingredients)}</textarea></div>
+      <div><label class="block text-sm font-semibold text-warmgray mb-1">Instructions</label><textarea id="formInstructions" class="form-input" rows="10" placeholder="How to make it">${esc(instructions)}</textarea></div>
+      <div class="flex items-center gap-3 pt-4 border-t border-sand"><button class="px-6 py-2 bg-sienna text-white rounded-xl hover:bg-bark transition-colors font-medium" data-action="saveRecipe">Save</button><button class="px-5 py-2 border border-sand text-warmgray rounded-xl hover:bg-sand-light transition-colors" data-action="cancelForm">Cancel</button><div class="flex-1"></div>${delBtn}</div>
+    </div>`, "");
+  document.getElementById('formCat').addEventListener('change',updateSubcategoryList);
+  renderRelatedList(); renderExtraLocList(); setupRecipePicker();
+  watchFormInputs();
+  document.getElementById('formName').focus();
+}
+function updateSubcategoryList() { const c=document.getElementById('formCat').value; document.getElementById('formSub').innerHTML='<option value="">Select subcategory...</option>'+getSubcategories(c).map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join(''); }
+function renderRelatedList() { const c=document.getElementById('relatedList'); if(!c) return; c.innerHTML=formRelated.map((n,i)=>`<span class="inline-flex items-center gap-1 px-3 py-1 bg-sand-light border border-sand rounded-full text-sm">${esc(n)} <span class="cursor-pointer text-warmgray hover:text-red-600 ml-1 text-base leading-none" data-action="removeRelated" data-ridx="${i}">×</span></span>`).join(''); }
+function renderExtraLocList() { const c=document.getElementById('extraLocList'); if(!c) return; const ac=getCategories(); c.innerHTML=formExtraLocs.map((loc,i)=>{ const co=ac.map(c=>`<option value="${esc(c)}" ${c===loc.Category?'selected':''}>${esc(c)}</option>`).join(''); const so=(loc.Category?getSubcategories(loc.Category):[]).map(s=>`<option value="${esc(s)}" ${s===loc.Subcategory?'selected':''}>${esc(s)}</option>`).join(''); return `<div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 items-center"><select class="form-input text-sm" onchange="updateExtraLocCat(${i},this.value)"><option value="">Category...</option>${co}</select><div class="flex items-center gap-2"><select class="form-input text-sm flex-1" onchange="updateExtraLocSub(${i},this.value)"><option value="">Subcategory...</option>${so}</select><span class="cursor-pointer text-warmgray hover:text-red-600 text-xl leading-none px-1 flex-shrink-0" data-action="removeExtraLoc" data-lidx="${i}">×</span></div></div>`; }).join(''); }
+function updateExtraLocCat(i,v){formExtraLocs[i].Category=v;formExtraLocs[i].Subcategory='';renderExtraLocList();}
+function updateExtraLocSub(i,v){formExtraLocs[i].Subcategory=v;}
+/** Get a unique display key for a recipe — appends source if the name is shared by multiple recipes */
+function getRecipeKey(recipe) {
+  const name = recipe['Recipe Name']||'';
+  const dupes = data.filter(r=>(r['Recipe Name']||'')===name);
+  if (dupes.length > 1 && recipe.Source) return `${name} — ${recipe.Source}`;
+  return name;
+}
+
+/** Get display name from a related recipe key (strip " — Source" suffix for display if it resolves) */
+function getRelatedDisplayName(key) {
+  const idx = findRecipeIndex(key);
+  if (idx >= 0) return data[idx]['Recipe Name'];
+  return key;
+}
+
+function setupRecipePicker() { const input=document.getElementById('relatedInput'),dd=document.getElementById('relatedDropdown'); if(!input||!dd) return; input.addEventListener('input',function(){const t=this.value.trim().toLowerCase();if(t.length<2){dd.classList.add('hidden');return;}const m=[];data.forEach((r,i)=>{const n=r['Recipe Name']||'';const key=getRecipeKey(r);if(n.toLowerCase().includes(t)&&!formRelated.includes(key)) m.push({index:i,recipe:r,key:key});});if(!m.length){dd.classList.add('hidden');return;}dd.innerHTML=m.map(({index,recipe,key})=>{const src=recipe.Source?`<span class="picker-source"> — ${esc(recipe.Source)}</span>`:'';return `<div class="picker-item" data-action="pickRelated" data-rname="${esc(key)}">${esc(recipe['Recipe Name'])}${src}</div>`;}).join('');dd.classList.remove('hidden');}); input.addEventListener('blur',()=>setTimeout(()=>dd.classList.add('hidden'),200)); input.addEventListener('focus',function(){if(this.value.trim().length>=2) this.dispatchEvent(new Event('input'));}); }
+
+// ═══════════════════════════════════════════════════════════
+// SAVE / DELETE / EXPORT
+// ═══════════════════════════════════════════════════════════
+async function saveRecipe() {
+  const cat=document.getElementById('formCat').value.trim(), sub=document.getElementById('formSub').value.trim(), name=document.getElementById('formName').value.trim();
+  if(!cat||!sub||!name){alert('Category, Subcategory, and Recipe Name are required.');return;}
+  const pw = await getPassword(); if(!pw) return;
+  const user=getUserName();
+  const recipe={'Category':cat,'Subcategory':sub,'Recipe Name':name,'Notes':document.getElementById('formNotes').value.trim(),'Source':document.getElementById('formSource').value.trim(),'Ingredients':document.getElementById('formIngredients').value.trim(),'Instructions':document.getElementById('formInstructions').value.trim(),'Related Recipes':formRelated.filter(Boolean),'Extra Locations':formExtraLocs.filter(l=>l.Category&&l.Subcategory),'_user':user||'Anonymous','_password':pw};
+
+  // Show saving indicator
+  const saveBtn = document.querySelector('[data-action="saveRecipe"]');
+  if (saveBtn) { saveBtn.textContent = 'Saving...'; saveBtn.disabled = true; }
+
+  try { let res; if(formMode==='edit'&&formEditIndex>=0) res=await fetch(`/api/recipes/${formEditIndex}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(recipe)}); else res=await fetch('/api/recipes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(recipe)}); if(!res.ok){const e=await res.json();alert('Save failed: '+(e.error||'Unknown'));if(saveBtn){saveBtn.textContent='Save';saveBtn.disabled=false;}return;} const result=await res.json(); data=await(await fetch('/api/recipes')).json(); formDirty=false; showRecipe(result.index); } catch(e){alert('Save failed: '+e.message);if(saveBtn){saveBtn.textContent='Save';saveBtn.disabled=false;}}
+}
+async function deleteRecipe(index) {
+  if(!confirm(`Delete "${data[index]['Recipe Name']}"?`)) return;
+  const pw = await getPassword(); if(!pw) return;
+  const user=getUserName();
+  try { const res=await fetch(`/api/recipes/${index}`,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({_user:user||'Anonymous',_password:pw})}); if(!res.ok){const e=await res.json();alert('Delete failed: '+(e.error||'Unknown'));return;} data=await(await fetch('/api/recipes')).json(); if(formReturnView&&formReturnView.category&&formReturnView.subcategory) showSubcategory(formReturnView.category,formReturnView.subcategory); else renderHome(); } catch(e){alert('Delete failed: '+e.message);}
+}
+function cancelForm() {
+  if (formDirty && !confirm('You have unsaved changes. Leave anyway?')) return;
+  formDirty = false;
+  if(!formReturnView){renderHome();return;} const rv=formReturnView; if(rv.view==='recipe'&&rv.recipeIndex>=0&&rv.recipeIndex<data.length) showRecipe(rv.recipeIndex); else if(rv.view==='subcategory') showSubcategory(rv.category,rv.subcategory); else if(rv.view==='category') showCategory(rv.category); else renderHome(); }
+
+function exportCSV() {
+  const headers=['Category','Subcategory','Recipe Name','Source','Notes','Ingredients','Instructions','Related Recipes','Extra Locations'];
+  let rows=[headers.join(',')];
+  data.forEach(r=>{
+    const extraStr=(r['Extra Locations']||[]).map(l=>`${l.Category} › ${l.Subcategory}`).join(', ');
+    const row=[r.Category||'',r.Subcategory||'',r['Recipe Name']||'',r.Source||'',r.Notes||'',r.Ingredients||'',r.Instructions||'',(r['Related Recipes']||[]).join(', '),extraStr];
+    rows.push(row.map(f=>{const s=String(f);return(s.includes(',')||s.includes('"')||s.includes('\n'))?`"${s.replace(/"/g,'""')}"`  :s;}).join(','));
+  });
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'})); a.download='Luke-Family-Cookbook.csv'; a.click();
+}
+
+function goBack() { if(currentView==='recipe'&&currentCategory&&currentSubcategory) showSubcategory(currentCategory,currentSubcategory); else if(currentView==='subcategory'&&currentCategory) showCategory(currentCategory); else renderHome(); }
+
+// ═══════════════════════════════════════════════════════════
+// EVENT DELEGATION
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('click',function(e){
+  const el=e.target.closest('[data-action]'); if(!el) return;
+  switch(el.dataset.action){
+    case 'goHome': if(!checkDirtyForm()) break; renderHome(); break;
+    case 'goBack': if(!checkDirtyForm()) break; goBack(); break;
+    case 'showCategory': if(!checkDirtyForm()) break; showCategory(el.dataset.cat); break;
+    case 'showSubcategory': if(!checkDirtyForm()) break; showSubcategory(el.dataset.cat,el.dataset.sub); break;
+    case 'showRecipe': if(!checkDirtyForm()) break; showRecipe(parseInt(el.dataset.idx)); break;
+    case 'addRecipe': if(!checkDirtyForm()) break; showForm('add',-1,el.dataset.cat||'',el.dataset.sub||''); break;
+    case 'editRecipe': showForm('edit',parseInt(el.dataset.idx)); break;
+    case 'saveRecipe': saveRecipe(); break;
+    case 'cancelForm': cancelForm(); break;
+    case 'deleteRecipe': deleteRecipe(parseInt(el.dataset.idx)); break;
+    case 'exportCSV': exportCSV(); break;
+    case 'toggleFavorite': toggleFavorite(parseInt(el.dataset.idx)); break;
+    case 'showFavorites': if(!checkDirtyForm()) break; renderFavorites(); break;
+    case 'showChangelog': if(!checkDirtyForm()) break; renderChangelog(); break;
+    case 'restoreRecipe': restoreRecipe(parseInt(el.dataset.cidx)); break;
+    case 'pickRelated': formRelated.push(el.dataset.rname); renderRelatedList(); document.getElementById('relatedInput').value=''; document.getElementById('relatedDropdown').classList.add('hidden'); break;
+    case 'removeRelated': formRelated.splice(parseInt(el.dataset.ridx),1); renderRelatedList(); break;
+    case 'addExtraLoc': formExtraLocs.push({Category:'',Subcategory:''}); renderExtraLocList(); break;
+    case 'removeExtraLoc': formExtraLocs.splice(parseInt(el.dataset.lidx),1); renderExtraLocList(); break;
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+history.replaceState({view:'home',cat:'',sub:'',idx:-1}, '');
+setupMainSearchPicker();
+loadData();
+</script>
+</body>
+</html>
